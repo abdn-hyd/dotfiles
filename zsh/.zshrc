@@ -1,3 +1,55 @@
+# global VPN settings
+export http_proxy=http://127.0.0.1:7897
+export https_proxy=http://127.0.0.1:7897
+
+# brew global path
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# export nvim path
+export NVIM_APPNAME=lazyVim
+
+# Zoxide-z
+eval "$(zoxide init zsh)"
+
+# fuzzy finder-fzf
+source <(fzf --zsh)
+
+# yazi-yy
+function yy() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
+# >>> mamba initialize >>>
+# !! Contents within this block are managed by 'micromamba shell init' !!
+export MAMBA_EXE='/opt/homebrew/bin/micromamba';
+export MAMBA_ROOT_PREFIX='/Users/gunneo/micromamba';
+__mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__mamba_setup"
+else
+    alias micromamba="$MAMBA_EXE"  # Fallback on help from micromamba activate
+fi
+unset __mamba_setup
+# <<< mamba initialize <<<
+
+# alias
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias ......="cd ../../../.."
+alias cls="clear"
+alias nv="nvim"
+alias rmds="$HOME/sh_scripts/rm_ds_store.sh"
+alias ls="eza --icons=always"
+alias mb="micromamba"
+alias mba="micromamba activate"
+alias mbd="micromamba deactivate"
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -103,55 +155,3 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# global VPN settings
-export http_proxy=http://127.0.0.1:7897
-export https_proxy=http://127.0.0.1:7897
-
-# brew global path
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# export nvim path
-export NVIM_APPNAME=lazyVim
-
-# Zoxide-z
-eval "$(zoxide init zsh)"
-
-# fuzzy finder-fzf
-source <(fzf --zsh)
-
-# yazi-yy
-function yy() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}
-
-# >>> mamba initialize >>>
-# !! Contents within this block are managed by 'micromamba shell init' !!
-export MAMBA_EXE='/opt/homebrew/bin/micromamba';
-export MAMBA_ROOT_PREFIX='/Users/gunneo/micromamba';
-__mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__mamba_setup"
-else
-    alias micromamba="$MAMBA_EXE"  # Fallback on help from micromamba activate
-fi
-unset __mamba_setup
-# <<< mamba initialize <<<
-
-# alias
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias ......="cd ../../../.."
-alias cls="clear"
-alias nv="nvim"
-alias rmds="$HOME/sh_scripts/rm_ds_store.sh"
-alias ls="eza --icons=always"
-alias mb="micromamba"
-alias mba="micromamba activate"
-alias mbd="micromamba deactivate"
