@@ -15,6 +15,8 @@ eval "$(zoxide init zsh)"
 source <(fzf --zsh)
 
 # yazi-yy
+export EDITOR='nvim'
+
 function yy() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
 	yazi "$@" --cwd-file="$tmp"
