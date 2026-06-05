@@ -30,6 +30,21 @@ return {
             -- the default case_mode is "smart_case"
           },
         },
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+          live_grep = {
+            additional_args = function()
+              return { "--hidden" }
+            end,
+          },
+          grep_string = {
+            additional_args = function()
+              return { "--hidden" }
+            end,
+          },
+        },
         -- configure custom mappings
         defaults = {
           preview = {
