@@ -48,3 +48,6 @@ vim.keymap.set(
 
 -- open current file
 keymap.set("n", "<leader>op", "<cmd>!open '%'<CR>", { noremap = true, silent = true, desc = "open file" })
+
+vim.keymap.set("v", '<leader>"', 'c""<Esc>P', { desc = "Surround selection with double quotes" })
+vim.keymap.set("v", "<leader>'", "c''<Esc>P", { desc = "Surround selection with single quotes" })
