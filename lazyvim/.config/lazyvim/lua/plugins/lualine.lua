@@ -3,14 +3,7 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     event = "VeryLazy",
-    opts = function(_, opts)
-      table.insert(opts.sections.lualine_x, {
-        function()
-          return "😄"
-        end,
-      })
-    end,
-    config = function()
+    config = function(_, opts)
       -- import lualine plugin safely
       local status, lualine = pcall(require, "lualine")
       if not status then
@@ -42,11 +35,17 @@ return {
       }
 
       -- configure lualine with modified theme
-      lualine.setup({
-        options = {
-          theme = lualine_gruvbox,
-        },
+      opts = opts or {}
+      opts.options = opts.options or {}
+      opts.options.theme = lualine_gruvbox
+      opts.sections = opts.sections or {}
+      opts.sections.lualine_x = opts.sections.lualine_x or {}
+      table.insert(opts.sections.lualine_x, {
+        function()
+          return "😄"
+        end,
       })
+      lualine.setup(opts)
     end,
   },
 }
