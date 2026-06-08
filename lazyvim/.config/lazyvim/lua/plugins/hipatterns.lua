@@ -14,8 +14,6 @@ return {
           pattern = "IMPORTANT",
           group = "ErrorMsg",
         },
-
-        hex_color = hipatterns.gen_highlighter.hex_color(),
       },
     })
   end,
