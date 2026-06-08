@@ -1,7 +1,7 @@
 return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    dependencies = { { "nvim-treesitter/nvim-treesitter", branch = "master" }, "nvim-mini/mini.nvim" },
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.nvim" },
     opts = {
       render_modes = true,
       enabled = true,
