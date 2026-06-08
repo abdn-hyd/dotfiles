@@ -24,18 +24,22 @@ keymap.set("n", "<leader>ds", ":CleanDSStoreFiles<CR>", { noremap = true, desc =
 -- Vim-maximizer
 keymap.set("n", "<leader>sm", ":MaximizerToggle<CR>", { noremap = true, silent = true, desc = "window maximization" }) -- toggle split window maximization
 
--- Telescope
+-- Snacks picker
 keymap.set(
   "n",
   "<leader>fs",
-  "<cmd>Telescope live_grep<CR>",
+  function()
+    Snacks.picker.grep({ hidden = true })
+  end,
   { noremap = true, silent = true, desc = "find string in current_dir" }
 ) -- find string in current working directory as you type
 keymap.set(
-  "n",
+  { "n", "x" },
   "<leader>fw",
-  "<cmd>Telescope grep_string<CR>",
-  { noremap = true, silent = true, desc = "find string under cursor dir" }
+  function()
+    Snacks.picker.grep_word({ hidden = true })
+  end,
+  { noremap = true, silent = true, desc = "find string under cursor" }
 ) -- find string under cursor in current working directory
 
 -- lazygit
