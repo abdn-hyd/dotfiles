@@ -7,7 +7,16 @@ export http_proxy=http://127.0.0.1:7897
 export https_proxy=http://127.0.0.1:7897
 
 # Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
+export HOMEBREW_PREFIX="/opt/homebrew"
+export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+export HOMEBREW_REPOSITORY="/opt/homebrew"
+
+path=(
+  "$HOMEBREW_PREFIX/bin"
+  "$HOMEBREW_PREFIX/sbin"
+  $path
+)
+export PATH
 
 # Neovim / LazyVim
 export NVIM_APPNAME=lazyVim
@@ -18,15 +27,67 @@ export EDITOR='nvim'
 # CLI integrations
 # ============================================================
 
-# Zoxide
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init zsh)"
-fi
+# zoxide lazy loading
+__load_zoxide() {
+  unfunction z zi __load_zoxide 2>/dev/null
 
-# fzf
-if command -v fzf >/dev/null 2>&1; then
-  source <(fzf --zsh)
-fi
+  if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+  else
+    print -u2 "zoxide not found"
+    return 127
+  fi
+}
+
+z() {
+  __load_zoxide
+  z "$@"
+}
+
+zi() {
+  __load_zoxide
+  zi "$@"
+}
+
+# # Zoxide
+# if command -v zoxide >/dev/null 2>&1; then
+#   eval "$(zoxide init zsh)"
+# fi
+
+# fzf lazy loading
+__load_fzf() {
+  if (( ! $+functions[fzf-history-widget] )); then
+    if command -v fzf >/dev/null 2>&1; then
+      source <(fzf --zsh)
+    else
+      print -u2 "fzf not found"
+      return 127
+    fi
+  fi
+}
+
+__fzf_lazy_history() {
+  __load_fzf || return
+  zle fzf-history-widget
+}
+
+__fzf_lazy_file() {
+  __load_fzf || return
+  zle fzf-file-widget
+}
+
+__fzf_lazy_cd() {
+  __load_fzf || return
+  zle fzf-cd-widget
+}
+
+zle -N __fzf_lazy_history
+zle -N __fzf_lazy_file
+zle -N __fzf_lazy_cd
+
+bindkey '^R' __fzf_lazy_history
+bindkey '^T' __fzf_lazy_file
+bindkey '^[c' __fzf_lazy_cd
 
 # yazi: yy helper
 function yy() {
@@ -38,19 +99,28 @@ function yy() {
   rm -f -- "$tmp"
 }
 
-# micromamba
+# micromamba lazy loading
 export MAMBA_EXE='/opt/homebrew/bin/micromamba'
-export MAMBA_ROOT_PREFIX='/Users/gunneo/micromamba'
+export MAMBA_ROOT_PREFIX="$HOME/micromamba"
 
-if [[ -x "$MAMBA_EXE" ]]; then
-  __mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"
-  if [ $? -eq 0 ]; then
-    eval "$__mamba_setup"
+micromamba() {
+  unfunction micromamba 2>/dev/null
+
+  if [[ -x "$MAMBA_EXE" ]]; then
+    local __mamba_setup
+    __mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"
+
+    if [[ $? -eq 0 ]]; then
+      eval "$__mamba_setup"
+      micromamba "$@"
+    else
+      "$MAMBA_EXE" "$@"
+    fi
   else
-    alias micromamba="$MAMBA_EXE"
+    print -u2 "micromamba not found: $MAMBA_EXE"
+    return 127
   fi
-  unset __mamba_setup
-fi
+}
 
 
 # ============================================================
@@ -71,10 +141,21 @@ alias mbd="micromamba deactivate"
 alias ll="ls -l"
 alias la="ls -la"
 alias lg="lazygit"
-
+alias f="fastfetch"
+alias sz="source $HOME/.zshrc"
 if command -v eza >/dev/null 2>&1; then
   alias ls="eza --icons=always"
 fi
+
+# bindkey
+_lazygit_widget() {
+  zle -I
+  lazygit
+  zle reset-prompt
+}
+
+zle -N lazygit-widget _lazygit_widget
+bindkey '^G' lazygit-widget
 
 
 # ============================================================
@@ -125,8 +206,8 @@ fi
 # Replay compdefs collected by zinit snippets before compinit.
 zinit cdreplay -q
 
-# Interactive plugins.
-zinit light zsh-users/zsh-autosuggestions
-
-# Must be loaded near the end.
+zinit ice wait'0' lucid
 zinit light zsh-users/zsh-syntax-highlighting
+
+# zinit ice wait'0' lucid
+zinit light zsh-users/zsh-autosuggestions
