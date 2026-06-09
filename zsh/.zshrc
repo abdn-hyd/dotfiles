@@ -13,6 +13,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export NVIM_APPNAME=lazyVim
 export EDITOR='nvim'
 
+
 # ============================================================
 # CLI integrations
 # ============================================================
@@ -75,6 +76,10 @@ if command -v eza >/dev/null 2>&1; then
   alias ls="eza --icons=always"
 fi
 
+
+# ============================================================
+# Zinit upgradation
+# ============================================================
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
@@ -89,12 +94,39 @@ autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 ### End of Zinit's installer chunk
 
+
+# ============================================================
+# Zinit plugins / OMZ migration
+# ============================================================
+
+# Oh My Zsh libraries required by migrated OMZ plugins/themes.
 zinit snippet OMZL::git.zsh
 zinit snippet OMZL::theme-and-appearance.zsh
+
+# Migrated Oh My Zsh plugins/theme.
 zinit snippet OMZP::git
 zinit snippet OMZP::web-search
 zinit snippet OMZT::gentoo
-zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-syntax-highlighting
-autoload -Uz compinit && compinit
+
+# Completion system.
+autoload -Uz compinit
+
+ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/.zcompdump"
+mkdir -p "${ZSH_COMPDUMP:h}"
+
+# Fast path: reuse existing compdump.
+# If completion behaves incorrectly, delete ~/.cache/zsh/.zcompdump* and restart zsh.
+if [[ -f "$ZSH_COMPDUMP" ]]; then
+  compinit -C -d "$ZSH_COMPDUMP"
+else
+  compinit -d "$ZSH_COMPDUMP"
+fi
+
+# Replay compdefs collected by zinit snippets before compinit.
 zinit cdreplay -q
+
+# Interactive plugins.
+zinit light zsh-users/zsh-autosuggestions
+
+# Must be loaded near the end.
+zinit light zsh-users/zsh-syntax-highlighting
