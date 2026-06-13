@@ -22,72 +22,22 @@ export PATH
 export NVIM_APPNAME=lazyVim
 export EDITOR='nvim'
 
+# zsh-defer
+source ~/zsh-defer/zsh-defer.plugin.zsh
 
 # ============================================================
 # CLI integrations
 # ============================================================
 
-# zoxide lazy loading
-__load_zoxide() {
-  unfunction z zi __load_zoxide 2>/dev/null
+# Zoxide
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
 
-  if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh)"
-  else
-    print -u2 "zoxide not found"
-    return 127
-  fi
-}
-
-z() {
-  __load_zoxide
-  z "$@"
-}
-
-zi() {
-  __load_zoxide
-  zi "$@"
-}
-
-# # Zoxide
-# if command -v zoxide >/dev/null 2>&1; then
-#   eval "$(zoxide init zsh)"
-# fi
-
-# fzf lazy loading
-__load_fzf() {
-  if (( ! $+functions[fzf-history-widget] )); then
-    if command -v fzf >/dev/null 2>&1; then
-      source <(fzf --zsh)
-    else
-      print -u2 "fzf not found"
-      return 127
-    fi
-  fi
-}
-
-__fzf_lazy_history() {
-  __load_fzf || return
-  zle fzf-history-widget
-}
-
-__fzf_lazy_file() {
-  __load_fzf || return
-  zle fzf-file-widget
-}
-
-__fzf_lazy_cd() {
-  __load_fzf || return
-  zle fzf-cd-widget
-}
-
-zle -N __fzf_lazy_history
-zle -N __fzf_lazy_file
-zle -N __fzf_lazy_cd
-
-bindkey '^R' __fzf_lazy_history
-bindkey '^T' __fzf_lazy_file
-bindkey '^[c' __fzf_lazy_cd
+# fzf
+if command -v fzf >/dev/null 2>&1; then
+  zsh-defer 'eval "$(fzf --zsh)"'
+fi
 
 # yazi: yy helper
 function yy() {
